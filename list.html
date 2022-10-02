@@ -110,7 +110,7 @@
 		        </div>
 		        
 		        <div class="col-md-2">
-		          <input type="text" class="form-control" placeholder="Day" id="day" />
+		          <input type="number" class="form-control" placeholder="Day" id="day" min="1" max="31" onblur="fieldValidation()" />
 		        </div>
 
 		        <div class="col-md-6">
@@ -131,11 +131,11 @@
 				</div>
 
 		        <div class="col-md-4">
-		          <input type="text" class="form-control" placeholder="Value" id="exvalue" />
+		          <input type="number" class="form-control" placeholder="Value" id="exvalue" />
 		        </div>
 
 		        <div class="col-md-2 d-flex justify-content-end">
-		        	<button type="button" class="btn btn-light" onclick="clearFields()">
+		        	<button type="button" class="btn btn-light" onclick="clearFields(true)">
 		        	  <i class="fas fa-broom"></i>
 		        	</button>
 

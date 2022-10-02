@@ -1,5 +1,19 @@
+/* Field Validation */
+	function fieldValidation () {
+		//HTML Elements
+		let day = document.getElementById('day')
+
+		if (day.value <=0 || day.value >31) {
+			console.log('Invalid date') /*debug*/
+			showModal('Invalid date', 'Please enter a valid date number', 'Close')
+			day.value = ''
+		}
+	}
+
+
 /* Clear Fields Function*/
-	function clearFields(){
+	function clearFields(set = false){
+		//HTML Elements
 		let year = document.getElementById('year')
 		let month = document.getElementById('month')
 		let day = document.getElementById('day')
@@ -7,12 +21,23 @@
 		let desc = document.getElementById('desc')
 		let exvalue = document.getElementById('exvalue')
 
-		year.value = ""
-		month.value = ""
-		day.value = ""
-		type.value = ""
-		desc.value = ""
-		exvalue.value = ""
+		if (set == false) {
+			year.value = ""
+			month.value = ""
+			day.value = ""
+			type.value = ""
+			desc.value = ""
+			exvalue.value = ""
+		} else {
+			year.value = ""
+			month.value = ""
+			day.value = ""
+			type.value = ""
+			desc.value = ""
+			exvalue.value = ""
+
+			loadList()
+		}
 	}
 
 
@@ -51,6 +76,8 @@
 		//	Modal style
 		if (title == 'Recording Success') {
 			document.getElementById('modalHeader').className += " text-success"
+			document.getElementById('btnLabel').className += " btn-success"
+		} else if(title == 'Expense Removed') {
 			document.getElementById('btnLabel').className += " btn-success"
 		} else {
 			document.getElementById('modalHeader').className += " text-danger"
@@ -124,6 +151,7 @@
 					continue	//jump
 				}
 
+				expense.id = i
 				expList.push(expense)
 			}
 			//	console.log(expList) /*debug*/
@@ -162,6 +190,10 @@
 			
 			//console.log(filtered) /*after - debug*/
 			return filtered
+		}
+
+		remove(id){
+			localStorage.removeItem(id)
 		}
 	}
 
@@ -205,39 +237,49 @@
 	}
 
 /* Expenses List Info */
-	function loadList (expenseList = Array()) {
-		if (expenseList == 0) {
+	function loadList (expenseList = Array(), filter = false) {
+		if (expenseList == 0 && filter == false) {
 			expenseList = db.getAll()
 		}
 
 		var tbody = document.getElementById('expenseList')		//HTML list
 		tbody.innerHTML = ''		//clear HTML element
 
-		expenseList.forEach(function(d){
-		//	console.log(d) /*debug*/
+		expenseList.forEach(function(e){
+			//	console.log(e) /*debug*/
 
-		//row
-		row = tbody.insertRow()
+			//row
+			row = tbody.insertRow()
 
-		//columns
-		row.insertCell(0).innerHTML = `${d.year}/${d.month}/${d.day}`	//YYYY-MM-DD
-		//type fix
-		switch(parseInt(d.type)){
-			case 1: d.type = "Food"
-				break
-			case 2: d.type = "Education"
-				break
-			case 3: d.type = "Leisure Activities"
-				break
-			case 4: d.type = "Health"
-				break
-			case 5: d.type = "Transport"
-				break
-		}
-		row.insertCell(1).innerHTML = d.type
-		row.insertCell(2).innerHTML = d.desc
-		row.insertCell(3).innerHTML = d.exvalue
-		row.insertCell(4).innerHTML = "x"
+			//columns
+			row.insertCell(0).innerHTML = `${e.year}/${e.month}/${e.day}`	//YYYY-MM-DD
+			//type fix
+			switch(parseInt(e.type)){
+				case 1: e.type = "Food"
+					break
+				case 2: e.type = "Education"
+					break
+				case 3: e.type = "Leisure Activities"
+					break
+				case 4: e.type = "Health"
+					break
+				case 5: e.type = "Transport"
+					break
+			}
+			row.insertCell(1).innerHTML = e.type
+			row.insertCell(2).innerHTML = e.desc
+			row.insertCell(3).innerHTML = e.exvalue
+			//remove btn
+			let removebtn = document.createElement("button")
+				removebtn.className = 'btn btn-danger'
+				removebtn.innerHTML = '<i class="fas fa-times"></i>'
+				removebtn.id = `expense-id_${e.id}`
+				removebtn.onclick = function() {
+					//console.log(`expense-id_${e.id} removed`) /*debug*/
+					db.remove(e.id)
+					loadList()
+				}
+			row.insertCell(4).append(removebtn)
 		})
 
 		return expenseList
@@ -257,5 +299,5 @@
 
 		searchList = db.search(fields)
 
-		loadList(searchList)
+		loadList(searchList, true)
 	}

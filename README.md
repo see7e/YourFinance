@@ -34,6 +34,27 @@ dependences: CS50
 
 This project can be divided into two main blocks. Leveraging the project that was already in development based on the materials provided by *Udemy*, focused on a finance-related scope, I decided to integrate it with the project developed during the *CS50x* course, specifically in Week 9. In that week, a system was built using Flask and SQL to manage investments and provide a list of results to the user.
 
+## Deployment
+
+Until I manage to automate the GH Actions for hosting the webpage, you can download the last release and run:
+
+```bash
+pip install -r requirements.txt
+```
+
+This will fetch all the packages there are used in this project and install for you, afeter this is just run:
+
+```bash
+flask run
+```
+
+This will gererate a link that you can access the project:
+
+```bash
+ * Running on http://127.0.0.1:5000
+INFO: Press CTRL+C to quit
+```
+
 ## Additional
 
 ```

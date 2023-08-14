@@ -1,26 +1,38 @@
-import os
+import os, sys
 
-from cs50 import SQL
+from cs50 import SQL # inside CS50x enviorment
+
+# Flask
 from flask import Flask, flash, redirect, render_template, request, session, jsonify
 from flask_session import Session
 from tempfile import mkdtemp
+
+# Security
+from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, usd, check_stock
+# Modules
+from app.controllers.helpers import (
+    apology, login_required, lookup, usd, check_stock, 
+    Expense, type_list, msg
+)
 
 # Configure application
-app = Flask(__name__)
+from app import app
 
 # Custom filter
 app.jinja_env.filters["usd"] = usd
 
 # Configure session to use filesystem (instead of signed cookies)
+""" SECRET_KEY = os.urandom(32)
+app.config['SECRET_KEY'] = SECRET_KEY """
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
+db = SQL("sqlite:///yourfinance.db")
 
 
 @app.after_request
@@ -34,9 +46,14 @@ def after_request(response):
 
 
 # Routes
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
+    if request.method == "POST":
+        email = request.form.get("email")
+        return render_template("register.html", email=email)
+    else:
         return render_template("index.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -147,6 +164,83 @@ def register():
         return render_template("register.html")
 
 
+# Udemy routes
+@app.route("/new", methods=['GET', 'POST'])
+@login_required
+def new_expenses():
+    if request.method == "POST":
+        user_id = session["user_id"]
+
+        year = request.form.get('year')
+        month = request.form.get('month')
+        day = request.form.get('day')
+        type = request.form.get('type')
+        desc = request.form.get('desc')
+        exvalue = request.form.get('exvalue')
+        
+        #expense = Expense(year, month, day, type, desc, exvalue)
+        #if expense.dataValidation():
+        try:
+            # CREATE
+            db.execute("INSERT INTO expenses ( \
+                            user_id, expense_year, expense_month, expense_day, type, desc, value \
+                    ) \
+                        VALUES (?, ?, ?, ?, ?, ?, ?);",
+                        user_id, int(year), int(month), int(day), type, desc, int(exvalue))
+
+            msg['titl'] = 'Recording Success'
+            msg['desc'] = 'Expense saved with success!'
+            msg['mbtn'] = 'Close'
+            msg['stts'] = 'success'
+            return render_template("new.html", types=type_list, msg=msg)
+        
+        except TypeError:
+            msg['titl'] = 'Recording error'
+            msg['desc'] = 'There are mandatory fields that have not been filled in.'
+            msg['mbtn'] = 'Go back and fix'
+            msg['stts'] = 'error'
+            return render_template("new.html", types=type_list, msg=msg)
+    else:
+        return render_template("new.html", types=type_list)
+
+
+@app.route("/list", methods=['GET', 'POST'])
+@login_required
+def list_expenses():
+    if request.method == "POST":
+            user_id = session["user_id"]
+
+            year = request.form.get('year')
+            month = request.form.get('month')
+            day = request.form.get('day')
+            type = request.form.get('type')
+            desc = request.form.get('desc')
+            exvalue = request.form.get('exvalue')
+
+            # RETRIEVE
+            rows = db.execute("SELECT * FROM expenses \
+                                WHERE( \
+                                    user_id = ? OR \
+                                    expense_year = ? OR \
+                                    expense_month = ? OR \
+                                    expense_day = ? OR \
+                                    type = ? OR \
+                                    desc = ? OR \
+                                    value = ? \
+                                );",
+                                user_id, year, month, day, type, desc, exvalue)
+
+            return render_template("list.html", types=type_list, msg=msg, data=rows)
+
+            # UPDATE
+            # DELETE
+    else:
+        user_id = session["user_id"]
+        rows = db.execute("SELECT * FROM expenses WHERE user_id = ?;", user_id)
+        return render_template("list.html", types=type_list, data=rows)
+
+
+# CS50 routes
 @app.route("/portifolio")
 @login_required
 def portifolio():
@@ -159,9 +253,12 @@ def portifolio():
     The function returns the rendered ``portfolio.html`` template, passing the necessary data to be
     displayed in the table.
     """
+    # User identification
+    user_id = session["user_id"]
+
+    # Verify current stock value and update each accumulated value
 
     # Fetch user's portfolio data from the database
-    user_id = session["user_id"]
     data = db.execute(
         "SELECT s.symbol, s.name, h.shares, h.price, h.total FROM hold h \
         JOIN stocks s ON h.stock_id = s.stock_id \
@@ -320,7 +417,7 @@ def buy():
                         stock_id,
                         shares,
                         price,
-                        cost,
+                        cost
                     )
                 else:
                     # If the user already holds this stock, update the existing record
@@ -331,7 +428,7 @@ def buy():
                         total_shares,
                         total_cost,
                         user_id,
-                        stock_id,
+                        stock_id
                     )
 
                 # Deduct the cost from the user's cash
@@ -348,11 +445,11 @@ def buy():
                     stock_id,
                     shares,
                     price,
-                    "BUY",
+                    "BUY"
                 )
 
                 # Redirect to the homepage after the successful purchase
-                return redirect("/")
+                return redirect("/portifolio")
     else:  # for GET method
         return render_template("buy.html")
 
@@ -433,11 +530,11 @@ def sell():
             stock_id,
             -shares_to_sell,
             stock_data["price"],
-            "SELL",
+            "SELL"
         )
 
         # Redirect to the homepage after the successful sell
-        return redirect("/")
+        return redirect("/portifolio")
 
     else:  # for GET method
         # Fetch user's portfolio data from the 'hold' table
@@ -446,7 +543,7 @@ def sell():
             "SELECT s.symbol, s.name, h.shares FROM hold h \
             JOIN stocks s ON h.stock_id = s.stock_id \
             WHERE h.user_id = ?;",
-            user_id,
+            user_id
         )
 
         return render_template("sell.html", portfolio_data=data)

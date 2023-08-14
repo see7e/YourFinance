@@ -26,7 +26,18 @@ from functools import wraps
 # 503 Service Unavailable
 # 504 Gateway Timeout
 
+# DEFINITIONS
+type_list = ["", "Food", "Education", "Leisure Activities", "Health", "Transport"]
 
+msg = {
+    'titl': '',
+    'desc': '',
+    'cbtn': '',
+    'stts': ''
+}
+
+
+# ADITIONAL FUNCTIONS
 def apology(message, code=400):
     """Render message as an apology to user."""
 
@@ -115,3 +126,46 @@ def check_stock(db, symbol, name):
     if not stock:
         # If stock not registred, insert a new record
         db.execute("INSERT INTO stocks (symbol, name) VALUES (?, ?);", symbol, name)
+
+
+class Expense:
+    def __init__(self, year, month, day, type, desc, exvalue):
+        self.year = year
+        self.month = month
+        self.day = day
+        self.type = type
+        self.desc = desc
+        self.exvalue = exvalue
+
+    def dataValidation(self):
+        return all(
+            getattr(self, field) is not None and getattr(self, field) != ''
+            for field in ['year', 'month', 'day', 'type', 'desc', 'exvalue']
+        )
+        
+
+""" class Db:
+    def record(self, e):
+        expense = Expense(
+            year=e.year,
+            month=e.month,
+            day=e.day,
+            type=e.type,
+            desc=e.desc,
+            exvalue=e.exvalue
+        )
+        db.session.add(expense)
+        db.session.commit()
+
+    def getAll(self):
+        return Expense.query.all()
+
+    def search(self, fields):
+        query = Expense.query.filter_by(**fields.__dict__)
+        return query.all()
+
+    def remove(self, id):
+        expense = Expense.query.get(id)
+        if expense:
+            db.session.delete(expense)
+            db.session.commit() """

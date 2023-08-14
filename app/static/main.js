@@ -1,3 +1,6 @@
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
+
 /* Field Validation */
 	function fieldValidation () {
 		//HTML Elements
@@ -12,7 +15,7 @@
 
 
 /* Clear Fields Function*/
-	function clearFields(set = false){
+	function clearFields(set = false) {
 		//HTML Elements
 		let year = document.getElementById('year')
 		let month = document.getElementById('month')
@@ -44,7 +47,7 @@
 /* Modal Wrap */
 	let modalWrap = null;
 
-	const showModal = (title, description, btn) => {
+	const showModal = (title, description, btn, status='error') => {
 		//garbage collector
 		if (modalWrap != null) {
 			modalWrap.remove();
@@ -52,7 +55,7 @@
 		// HTML structure
 		modalWrap = document.createElement('div');
 		modalWrap.innerHTML = `
-			<div class="modal fade" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+			<div id="modal" class="modal fade" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
 				<div class="modal-dialog modal-dialog-centered">
 					<div class="modal-content">
 						<div class="modal-header" id="modalHeader">
@@ -74,10 +77,10 @@
 		document.body.append(modalWrap);
 
 		//	Modal style
-		if (title == 'Recording Success') {
+		if (status == 'success') {
 			document.getElementById('modalHeader').className += " text-success"
 			document.getElementById('btnLabel').className += " btn-success"
-		} else if(title == 'Expense Removed') {
+		} else if(status == 'ok') { //Expense Removed
 			document.getElementById('btnLabel').className += " btn-success"
 		} else {
 			document.getElementById('modalHeader').className += " text-danger"
@@ -199,9 +202,11 @@
 
 	let db = new Db()
 
-/* Add expense btn */
+/* Add expense btn 
+	CONVERT TO FLASK
+
 	function newexpense(){
-		/*console.log('Running') /*debug*/
+		//console.log('Running') //debug
 		let year = document.getElementById('year')
 		let month = document.getElementById('month')
 		let day = document.getElementById('day')
@@ -209,7 +214,7 @@
 		let desc = document.getElementById('desc')
 		let exvalue = document.getElementById('exvalue')
 
-		/* new object instance of expenses*/
+		// new object instance of expenses
 		let expense = new Expense(
 			year.value,
 			month.value,
@@ -219,24 +224,26 @@
 			exvalue.value
 		)
 
-		//console.log(expense) /*debug*/
+		//console.log(expense) //debug
 
 		if (expense.dataValidation()) {
-			//	console.log('dataValidation() pass') /*debug*/
+			//	console.log('dataValidation() pass') //debug
 			db.record(expense)
 			//	modal instance
-			showModal('Recording Success', 'expense save with success!', 'Close')
+			showModal('Recording Success', 'expense save with success!', 'Close', 'success')
 			clearFields()
 
 		} else {
-			//	console.log('dataValidation() fail') /*debug*/
+			//	console.log('dataValidation() fail') //debug
 			//	modal instance
 			showModal('Recording error', 'There are mandatory fields that have not been filled in.', 'Go back and fix')
 		}
 		
 	}
+*/
+/* Expenses List Info 
+	CONVERT TO FLASK
 
-/* Expenses List Info */
 	function loadList (expenseList = Array(), filter = false) {
 		if (expenseList == 0 && filter == false) {
 			expenseList = db.getAll()
@@ -246,7 +253,7 @@
 		tbody.innerHTML = ''		//clear HTML element
 
 		expenseList.forEach(function(e){
-			//	console.log(e) /*debug*/
+			//	console.log(e) //debug
 
 			//row
 			row = tbody.insertRow()
@@ -275,7 +282,7 @@
 				removebtn.innerHTML = '<i class="fas fa-times"></i>'
 				removebtn.id = `expense-id_${e.id}`
 				removebtn.onclick = function() {
-					//console.log(`expense-id_${e.id} removed`) /*debug*/
+					//console.log(`expense-id_${e.id} removed`) //debug
 					db.remove(e.id)
 					loadList()
 				}
@@ -301,3 +308,4 @@
 
 		loadList(searchList, true)
 	}
+

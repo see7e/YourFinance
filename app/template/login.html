@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Log In
+    - Log In
 {% endblock %}
 
 {% block main %}
-    <div class="login-form">
+    <div class="container-fluid py-5 text-center login-form">
         <div class="mb-3 avatar">
-            <!-- You can replace the image source with the persona figure -->
-            <img src="https://via.placeholder.com/150" alt="Avatar">
+            <!-- <a href="https://www.flaticon.com/free-icons/user" title="user icons">User icons created by Becris - Flaticon</a> -->
+            <img src="../static/img/user.png" alt="Avatar">
         </div>
         <h2 class="mb-3">Login</h2>
         <form action="/login" method="post">
@@ -21,7 +21,7 @@
                 <input class="form-control mx-auto w-auto" name="password" type="password">
             </div>
             <div class="mb-3">
-                <button type="submit" class="btn btn-primary">Log In</button>
+                <button type="submit" class="btn btn-warning">Log In!</button>
             </div>
         </form>
     </div>

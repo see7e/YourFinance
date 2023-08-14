@@ -48,7 +48,7 @@ This will fetch all the packages there are used in this project and install for 
 flask run
 ```
 
-This will gererate a link that you can access the project:
+This will generate a link that you can access the project:
 
 ```bash
  * Running on http://127.0.0.1:5000
@@ -56,6 +56,10 @@ INFO: Press CTRL+C to quit
 ```
 
 ## Additional
+
+### YT Video
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/YN211SIAGMY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 ```
 colors {

@@ -7,7 +7,7 @@ def _wrap_flask(f):
         return
 
     from distutils.version import StrictVersion
-    from .cs50 import _formatException
+    from cs50 import _formatException
 
     if f.__version__ < StrictVersion("1.0"):
         return

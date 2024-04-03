@@ -1,4 +1,9 @@
 # Ignore Flask generated files
 flask_session/
-*/__pycache__/
-*/*/__pycache__/
+**/__pycache__/
+
+# Envs
+.venv/
+venv/
+.env/
+env/

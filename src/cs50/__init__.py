@@ -7,10 +7,11 @@ import sys
 logging.getLogger("cs50").disabled = True
 
 # Import cs50_*
-from .cs50 import get_char, get_float, get_int, get_string
 try:
-    from .cs50 import get_long
-except ImportError:
+    from cs50 import get_char, get_float, get_int, get_string
+    from cs50 import get_long
+except Exception as e:
+    print(e)
     pass
 
 # Hook into flask importing

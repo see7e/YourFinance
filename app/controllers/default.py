@@ -121,7 +121,7 @@ def logout():
 def register():
     """This function handles user registration.
 
-    -   If the request method is ``POST``, it takes the ``username``, ``password``, and ``password``
+    -   If the request method is ``POST``, it takes the ``username``, ``password``, and ``confirmation``
         ``confirmation`` from the form data.
     -   It checks if all the necessary fields are provided, if the ``password`` and ``confirmation``
         match, and if the ``username`` is not already taken (by querying the database).
@@ -131,31 +131,28 @@ def register():
     -   If the request method is GET, it renders the ``register.html`` template, where the user can
         input their registration details.
     """
-
-    username = request.form.get("username")
-    password = request.form.get("password")
-    confirmation = request.form.get("confirmation")
-
     if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        confirmation = request.form.get("confirmation")
+
         if not username:
             return apology("Must provide username")
         elif not password:
             return apology("Must provide password")
         elif password != confirmation:
-            return apology("Passowrd doen't match")
+            return apology("Password doesn't match")
 
-        # Run query
+        # Check if username already exists
         rows = db.execute("SELECT * FROM users WHERE username = ?;", username)
-
-        # Ensure username not present in DB
-        if len(rows) != 0:
-            return apology("User already exists")
+        if rows:
+            return apology("Username already exists")
 
         # Creates the hash for the password
-        password = generate_password_hash(password)
-        rows = db.execute(
-            "INSERT INTO users (username, hash) VALUES (?, ?);", username, password
-        )
+        hashed_password = generate_password_hash(password)
+        
+        # Insert new user into the database
+        db.execute("INSERT INTO users (username, hash) VALUES (?, ?);", username, hashed_password)
 
         # Go to Home
         return redirect("/")

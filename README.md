@@ -2,7 +2,7 @@
 title: CS50 - Final Project
 aliases:
 - yourFinance
-tags: programação, cs50
+tags: programming, cs50
 use: Documentation
 languages: 
 dependences: CS50
